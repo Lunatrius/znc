@@ -49,3 +49,8 @@ __pycache__
 /src/Csocket.cpp
 /include/znc/Csocket.h
 
+# Windows
+*.exe
+*.dll
+*.dll.a
+*.in~
