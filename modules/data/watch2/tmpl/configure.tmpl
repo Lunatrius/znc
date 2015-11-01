@@ -1,0 +1,110 @@
+<? INC Header.tmpl ?>
+
+<style type="text/css">
+#watch2_configure input {
+	width: auto;
+	height: auto;
+}
+
+#watch2_configure input.inp {
+	width: 75pt;
+}
+
+#watch2_configure td {
+	text-align: center;
+}
+</style>
+<script type="text/javascript">
+	window.watch2index = 1;
+
+	function addRow(hostmask, target, pattern, sources, off, detachedclientonly, detachedchannelonly) {
+		var index = window.watch2index;
+
+		var tr = $("<tr>").attr("id", "watch2row" + index);
+		$("<input>").addClass("inp").attr("name", "hostmask_" + index).val(hostmask).appendTo($("<td>").appendTo(tr));
+		$("<input>").addClass("inp").attr("name", "target_" + index).val(target).appendTo($("<td>").appendTo(tr));
+		$("<input>").addClass("inp").attr("name", "pattern_" + index).val(pattern).appendTo($("<td>").appendTo(tr));
+		$("<input>").addClass("inp").attr("name", "sources_" + index).val(sources).appendTo($("<td>").appendTo(tr));
+		$("<input>").attr({
+			"type": "checkbox",
+			"name": "off_" + index
+		}).prop("checked", off).appendTo($("<td>").appendTo(tr));
+		$("<input>").attr({
+			"type": "checkbox",
+			"name": "detachedclientonly_" + index
+		}).prop("checked", detachedclientonly).appendTo($("<td>").appendTo(tr));
+		$("<input>").attr({
+			"type": "checkbox",
+			"name": "detachedchannelonly_" + index
+		}).prop("checked", detachedchannelonly).appendTo($("<td>").appendTo(tr));
+		$("<input>").attr("type", "button").val("X").click(function () {
+			tr.remove();
+			$("has_" + index).val("0");
+		}).appendTo($("<td>").appendTo(tr));
+
+		var input = $("<input>").attr({
+			"id": "has_" + index,
+			"name": "has_" + index,
+			"type": "hidden",
+			"value": "1"
+		});
+
+		var container = $("#watch2tbody");
+		container.append(tr);
+		container.append(input);
+
+		window.watch2index++;
+	}
+
+	function processRow(id) {
+		var data = $(id).val().split("::DATA-SPLIT::");
+		if (data.length !== 7) {
+			alert("Invalid data!\n\n" + data.join("\n"));
+			return;
+		}
+
+		for (var i = 4; i < 7; i++) {
+			data[i] = data[i] === "true";
+		}
+
+		addRow.apply(window, data);
+	}
+</script>
+<form method="post" action="">
+	<? INC _csrf_check.tmpl ?>
+	<div class="section">
+		<h3><? VAR Title ?></h3>
+		<div class="sectionbg">
+			<div class="sectionbody">
+				<div class="subsection full">
+					<table class="data" id="watch2_configure">
+						<thead>
+							<tr>
+								<td>Hostmask</td>
+								<td>Target</td>
+								<td>Pattern</td>
+								<td>Sources</td>
+								<td>Off</td>
+								<td>Detached Client Only</td>
+								<td>Detached Channel Only</td>
+								<td>X</td>
+							</tr>
+						</thead>
+						<tbody id="watch2tbody">
+							<? LOOP ConfigureLoop ?>
+							<textarea id="watch2data<? VAR Id ?>" style="display:none"><? VAR HostMask ?>::DATA-SPLIT::<? VAR Target ?>::DATA-SPLIT::<? VAR Pattern ?>::DATA-SPLIT::<? VAR Sources ?>::DATA-SPLIT::<? VAR Off ?>::DATA-SPLIT::<? VAR DetachedClientOnly ?>::DATA-SPLIT::<? VAR DetachedChannelOnly ?></textarea>
+							<script>processRow("#watch2data<? VAR Id ?>");</script>
+							<? ENDLOOP ?>
+						</tbody>
+					</table>
+				</div>
+				<div class="subsection submitline">
+					<input type="button" value="Add Another Entry" onclick="addRow('', '', '', '', false, false, false)" />
+					<input type="submit" name="submit" value="Save" />
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+
+<? INC Footer.tmpl ?>
