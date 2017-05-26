@@ -593,6 +593,9 @@ bool CZNC::WriteConfig() {
         return false;
     }
 
+    CFile tempFile(GetConfigFile());
+    tempFile.Delete();
+
     // We wrote to a temporary name, move it to the right place
     if (!pFile->Move(GetConfigFile(), true)) {
         DEBUG(
